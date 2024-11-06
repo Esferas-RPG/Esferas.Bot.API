@@ -1,0 +1,6 @@
+@esferasAPI_HostAddress = http://localhost:5101
+
+GET {{esferasAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

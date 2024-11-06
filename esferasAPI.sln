@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "esferasAPI", "esferasAPI\esferasAPI.csproj", "{F3533E1C-D4F7-4CD8-81A1-76BC4D30845D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3533E1C-D4F7-4CD8-81A1-76BC4D30845D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3533E1C-D4F7-4CD8-81A1-76BC4D30845D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3533E1C-D4F7-4CD8-81A1-76BC4D30845D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3533E1C-D4F7-4CD8-81A1-76BC4D30845D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B73BAA9D-6E74-41C6-9C9D-587E469B7CBE}
+	EndGlobalSection
+EndGlobal
