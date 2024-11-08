@@ -16,5 +16,10 @@ namespace apiEsferas.Application.Sevices
         {
             return await googleSheetsService.addNewCharacterAsync(newCharacterName);
         }
+
+        internal async Task registNewCharacter(Func<string> characterName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,7 +1,6 @@
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using apiEsferas.Domain.Interfaces;
@@ -93,19 +92,5 @@ namespace apiEsferas.Infrastructure.Services
             await batchUpdate.ExecuteAsync();
         }
 
-
-        // Método auxiliar para converter índices de coluna para letra (A, B, C...)
-        private string GetColumnName(int index)
-        {
-            int dividend = index + 1;
-            string columnName = String.Empty;
-            while (dividend > 0)
-            {
-                int modulo = (dividend - 1) % 26;
-                columnName = (char)(65 + modulo) + columnName;
-                dividend = (dividend - modulo) / 26;
-            }
-            return columnName;
-        }
     }
 }

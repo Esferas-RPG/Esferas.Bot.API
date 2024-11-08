@@ -1,4 +1,5 @@
 using apiEsferas.Application.Sevices;
+using apiEsferas.Application.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiEsferas.Controllers
@@ -25,7 +26,7 @@ namespace apiEsferas.Controllers
             {
                 return BadRequest("The name of the new Character is requered");
             }
-
+            //* Adicionar verificação se o jogador já existe
             try
             {
                 var newSheetUrl = await spreadSheetAppService.registNewCharacter(CharacterName);
@@ -38,8 +39,5 @@ namespace apiEsferas.Controllers
         }
     }
 
-    public class CopyRequest
-    {
-        public string newCharacterName {get; set;}
-    }
+    
 }
