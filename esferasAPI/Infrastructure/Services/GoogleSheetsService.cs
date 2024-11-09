@@ -5,6 +5,8 @@ using Google.Apis.Drive.v3.Data;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using apiEsferas.Domain.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
+using apiEsferas.Domain.Exceptions;
 
 namespace apiEsferas.Infrastructure.Services
 {
@@ -47,6 +49,21 @@ namespace apiEsferas.Infrastructure.Services
         // Método para criar nova planilha copiando um template e copiar valores
         public async Task<string> addNewCharacterAsync(string newCharacterName)
         {
+            // Lista os arquivos no drive
+            var getFiles = driveService.Files.List();
+            getFiles.Q = $"'{destinationFolderId}' in parents and name contains '{newCharacterName}' and trashed = false";
+            getFiles.Fields = "files(id, name)";
+            var resultado = getFiles.Execute();
+            var files = resultado.Files;
+
+            // Verifica se existem arquivos
+            if (files != null && files.Any())
+            {
+                // Retorna o primeiro arquivo encontrado com o nome que contém o parâmetro
+                // Envia erro se o arquivo com nome igual existir
+                throw new DuplicateCharacterException(newCharacterName);
+            }
+
             // Cria uma nova cópia da planilha de template no Google Drive
             var requestBody = new Google.Apis.Drive.v3.Data.File
             {
@@ -57,55 +74,7 @@ namespace apiEsferas.Infrastructure.Services
             var request = driveService.Files.Copy(requestBody, templateSpreadSheetId);
             var file = await request.ExecuteAsync();
 
-            // Copia os dados da planilha template
-            await CopyData(file.Id);
-
             return $"https://docs.google.com/spreadsheets/d/{file.Id}";
-        }
-
-        // Método para copiar os dados da planilha template para a nova planilha
-        private async Task CopyData(string newSheetId)
-        {
-            // Pega os dados da planilha template (valores)
-            var getDataRequest = sheetsService.Spreadsheets.Values.Get(templateSpreadSheetId, "A1:Z1000"); // Ajuste o intervalo conforme necessário
-            var dataResponse = await getDataRequest.ExecuteAsync();
-            var values = dataResponse.Values;
-
-            // Configura o valor a ser copiado para o novo documento usando uma requisição em lote
-            var data = new List<ValueRange>
-            {
-                new ValueRange
-                {
-                    Range = "LOG!A1:Z1000", // Certifique-se de que a aba e o intervalo estão corretos
-                    Values = values
-                }
-            };
-
-            // Usa o método BatchUpdate para evitar múltiplas requisições
-            var batchUpdateRequest = new BatchUpdateValuesRequest
-            {
-                Data = data,
-                ValueInputOption = "RAW"
-            };
-
-            // Executa o BatchUpdate
-            var batchUpdate = sheetsService.Spreadsheets.Values.BatchUpdate(batchUpdateRequest, newSheetId);
-            await batchUpdate.ExecuteAsync();
-        }
-
-
-        // Método auxiliar para converter índices de coluna para letra (A, B, C...)
-        private string GetColumnName(int index)
-        {
-            int dividend = index + 1;
-            string columnName = String.Empty;
-            while (dividend > 0)
-            {
-                int modulo = (dividend - 1) % 26;
-                columnName = (char)(65 + modulo) + columnName;
-                dividend = (dividend - modulo) / 26;
-            }
-            return columnName;
         }
     }
 }
