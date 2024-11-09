@@ -60,6 +60,14 @@ namespace apiEsferas.Infrastructure.Services
 
             await updateCellValueAsync(file.Id,$"LOG:C133", playerId);
 
+            // Ajustar permissao da ficha
+            var permission = new Google.Apis.Drive.v3.Data.Permission
+            {
+                Type = "anyone",
+                Role = "writer"
+            };
+            await driveService.Permissions.Create(permission, file.Id).ExecuteAsync();
+
             return $"https://docs.google.com/spreadsheets/d/{file.Id}";
         }
 
