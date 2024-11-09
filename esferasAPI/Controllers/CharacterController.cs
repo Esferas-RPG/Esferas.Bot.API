@@ -22,7 +22,7 @@ namespace apiEsferas.Controllers
         {
             var CharacterName = request.newCharacterName;
             var playerId = request.playerId;
-            
+
             Console.WriteLine(CharacterName);
             if(string.IsNullOrEmpty(CharacterName))
             {
@@ -88,3 +88,4 @@ namespace apiEsferas.Controllers
             return Ok(new{message = result});
         }
     }
+}
