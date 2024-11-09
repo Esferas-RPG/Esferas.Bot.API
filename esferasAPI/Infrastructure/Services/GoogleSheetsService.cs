@@ -57,13 +57,15 @@ namespace apiEsferas.Infrastructure.Services
             var request = driveService.Files.Copy(requestBody, templateSpreadSheetId);
             var file = await request.ExecuteAsync();
 
-            // Copia os dados da planilha template
-            await CopyData(file.Id);
+            //* because of solicitations the notes are being copied throw this function don't delete pls
+            // await CopyData(file.Id, "LOG!A1:Z1000");
+            //* add the player id to the new sheet //
             await updateCellValueAsync(file.Id,$"LOG:C133", playerId);
 
             return $"https://docs.google.com/spreadsheets/d/{file.Id}";
         }
-
+        
+        //* continue after the server opening
         public async Task<bool> IsPlayerRegisteredAsync(string playerId)
         {
             string range = $"ListaDeJogadores!B6:B1000";
@@ -95,7 +97,7 @@ namespace apiEsferas.Infrastructure.Services
         public async Task<string> deletCharacterSheet(string logsLink)
         {
             // 1. Extrair o Spreadsheet ID do link.
-            string spreadsheetId = ExtractSpreadsheetIdFromUrl(logsLink);
+            string spreadsheetId = ExtractIdFromUrl(logsLink);
             if (string.IsNullOrEmpty(spreadsheetId))
             {
                 return "Error: Invalid Google Sheets URL.";
@@ -163,7 +165,7 @@ namespace apiEsferas.Infrastructure.Services
         }
 
         //* extract the id of the spreadsheets of the url
-        private string ExtractSpreadsheetIdFromUrl(string sheetUrl)
+        private string ExtractIdFromUrl(string sheetUrl)
         {
             var urlParts = sheetUrl.Split('/');
 
@@ -176,31 +178,31 @@ namespace apiEsferas.Infrastructure.Services
         }
 
         //* copy the notes of the sheets template and past to the new sheet
-        private async Task CopyData(string newSheetId)
-        {
+        // private async Task CopyData(string newSheetId, string range)
+        // {
 
-            var getDataRequest = sheetsService.Spreadsheets.Values.Get(templateSpreadSheetId, "A1:Z1000"); // Ajuste o intervalo conforme necessário
-            var dataResponse = await getDataRequest.ExecuteAsync();
-            var values = dataResponse.Values;
+        //     var getDataRequest = sheetsService.Spreadsheets.Values.Get(templateSpreadSheetId, "A1:Z1000");
+        //     var dataResponse = await getDataRequest.ExecuteAsync();
+        //     var values = dataResponse.Values;
 
-            var data = new List<ValueRange>
-            {
-                new ValueRange
-                {
-                    Range = "LOG!A1:Z1000",
-                    Values = values
-                }
-            };
+        //     var data = new List<ValueRange>
+        //     {
+        //         new ValueRange
+        //         {
+        //             Range = range,
+        //             Values = values
+        //         }
+        //     };
 
-            var batchUpdateRequest = new BatchUpdateValuesRequest
-            {
-                Data = data,
-                ValueInputOption = "RAW"
-            };
+        //     var batchUpdateRequest = new BatchUpdateValuesRequest
+        //     {
+        //         Data = data,
+        //         ValueInputOption = "RAW"
+        //     };
 
-            var batchUpdate = sheetsService.Spreadsheets.Values.BatchUpdate(batchUpdateRequest, newSheetId);
-            await batchUpdate.ExecuteAsync();
-        }
+        //     var batchUpdate = sheetsService.Spreadsheets.Values.BatchUpdate(batchUpdateRequest, newSheetId);
+        //     await batchUpdate.ExecuteAsync();
+        // }
 
         #endregion
     }
