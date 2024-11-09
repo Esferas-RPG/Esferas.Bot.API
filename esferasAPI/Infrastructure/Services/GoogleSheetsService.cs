@@ -4,6 +4,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using apiEsferas.Domain.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace apiEsferas.Infrastructure.Services
 {
@@ -57,6 +58,7 @@ namespace apiEsferas.Infrastructure.Services
             var request = driveService.Files.Copy(requestBody, templateSpreadSheetId);
             var file = await request.ExecuteAsync();
 
+<<<<<<< HEAD
             // Copia os dados da planilha template
             await CopyData(file.Id);
             await updateCellValueAsync(file.Id,$"LOG:C133", playerId);
@@ -203,5 +205,10 @@ namespace apiEsferas.Infrastructure.Services
         }
 
         #endregion
+=======
+           
+            return $"https://docs.google.com/spreadsheets/d/{file.Id}";
+        }
+>>>>>>> 87d807a99a13061a66ce533853a0241127465a94
     }
 }

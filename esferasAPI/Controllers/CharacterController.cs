@@ -42,7 +42,7 @@ namespace apiEsferas.Controllers
             }
             catch(Exception ex)
             {
-                return StatusCode(500, $"Error:{ex.Message}");
+                return StatusCode(500, new {error = ex.Message});
             }
         }
     
@@ -83,6 +83,3 @@ namespace apiEsferas.Controllers
             return Ok(new{message = result});
         }
     }
-
-    
-}
