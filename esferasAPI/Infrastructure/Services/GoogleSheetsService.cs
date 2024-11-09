@@ -1,7 +1,6 @@
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using apiEsferas.Domain.Interfaces;
@@ -16,6 +15,7 @@ namespace apiEsferas.Infrastructure.Services
         private readonly string credentialFilePath;
         private readonly string templateSpreadSheetId;
         private readonly string destinationFolderId;
+        private readonly string playerDataBaseId;
 
         public GoogleSheetsService()
         {
@@ -26,6 +26,7 @@ namespace apiEsferas.Infrastructure.Services
             credentialFilePath = Environment.GetEnvironmentVariable("CLIENT_CREDENTIONS_JSON_PATH");
             templateSpreadSheetId = Environment.GetEnvironmentVariable("SHEET_TEMPLATE_ID");
             destinationFolderId = Environment.GetEnvironmentVariable("FOLDER_ID");
+            playerDataBaseId = Environment.GetEnvironmentVariable("PLAYER_DATA_BASE_ID");
 
             // Carrega credenciais para o Sheets
             var credential = GoogleCredential.FromFile(credentialFilePath)
@@ -45,8 +46,7 @@ namespace apiEsferas.Infrastructure.Services
             });
         }
 
-        // Método para criar nova planilha copiando um template e copiar valores
-        public async Task<string> addNewCharacterAsync(string newCharacterName)
+        public async Task<string> addNewCharacterAsync(string newCharacterName, string playerId)
         {
             // Cria uma nova cópia da planilha de template no Google Drive
             var requestBody = new Google.Apis.Drive.v3.Data.File
@@ -58,6 +58,7 @@ namespace apiEsferas.Infrastructure.Services
             var request = driveService.Files.Copy(requestBody, templateSpreadSheetId);
             var file = await request.ExecuteAsync();
 
+           
             return $"https://docs.google.com/spreadsheets/d/{file.Id}";
         }
     }
