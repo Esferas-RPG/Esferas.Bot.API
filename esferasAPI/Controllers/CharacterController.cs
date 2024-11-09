@@ -46,7 +46,6 @@ namespace apiEsferas.Controllers
             }
         }
 
-        //* listar players
         [HttpGet("listPlayers")]
         public async Task<IActionResult> ListPlayers()
         {
@@ -57,8 +56,7 @@ namespace apiEsferas.Controllers
             });
         }
 
-
-        //* Não mexer nesta caralha - to fazendo ainda luan
+        // Aguardando implementacao
         // [HttpPost("moveFile")]
         // public async Task<IActionResult> moveFiles([FromBody] moveFilesRequest request)
         // {
@@ -66,8 +64,6 @@ namespace apiEsferas.Controllers
         //     var destinationFolderId = request.destinationLink;
         // }
 
-
-        //* delete the log
         [HttpPost("deleteSheets")]
         public async Task<IActionResult> deleteCharacter([FromBody] CharacterDeleteRequest request)
         {
