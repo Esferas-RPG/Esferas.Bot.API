@@ -1,11 +1,12 @@
-
 namespace apiEsferas.Application.DTO;
-public class CopyRequest
+
+public class CharacterRequest
 {
+    public string playerId {get; set;}
     public string newCharacterName {get; set;}
 
 
-    public CopyRequest(string newCharacterName)
+    public CharacterRequest(string newCharacterName)
     {
         this.newCharacterName = newCharacterName;
     }

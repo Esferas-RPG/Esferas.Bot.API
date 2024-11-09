@@ -14,6 +14,7 @@ namespace apiEsferas.Infrastructure.Services
         private readonly string credentialFilePath;
         private readonly string templateSpreadSheetId;
         private readonly string destinationFolderId;
+        private readonly string playerDataBaseId;
 
         public GoogleSheetsService()
         {
@@ -24,6 +25,7 @@ namespace apiEsferas.Infrastructure.Services
             credentialFilePath = Environment.GetEnvironmentVariable("CLIENT_CREDENTIONS_JSON_PATH");
             templateSpreadSheetId = Environment.GetEnvironmentVariable("SHEET_TEMPLATE_ID");
             destinationFolderId = Environment.GetEnvironmentVariable("FOLDER_ID");
+            playerDataBaseId = Environment.GetEnvironmentVariable("PLAYER_DATA_BASE_ID");
 
             // Carrega credenciais para o Sheets
             var credential = GoogleCredential.FromFile(credentialFilePath)
@@ -43,8 +45,7 @@ namespace apiEsferas.Infrastructure.Services
             });
         }
 
-        // Método para criar nova planilha copiando um template e copiar valores
-        public async Task<string> addNewCharacterAsync(string newCharacterName)
+        public async Task<string> addNewCharacterAsync(string newCharacterName, string playerId)
         {
             // Cria uma nova cópia da planilha de template no Google Drive
             var requestBody = new Google.Apis.Drive.v3.Data.File
@@ -58,39 +59,149 @@ namespace apiEsferas.Infrastructure.Services
 
             // Copia os dados da planilha template
             await CopyData(file.Id);
+            await updateCellValueAsync(file.Id,$"LOG:C133", playerId);
 
             return $"https://docs.google.com/spreadsheets/d/{file.Id}";
         }
 
-        // Método para copiar os dados da planilha template para a nova planilha
+        public async Task<bool> IsPlayerRegisteredAsync(string playerId)
+        {
+            string range = $"ListaDeJogadores!B6:B1000";
+
+            var request = sheetsService.Spreadsheets.Values.Get(playerDataBaseId, range);
+            var response = await request.ExecuteAsync();
+            Console.WriteLine(request);
+            Console.WriteLine(response);
+            var values = response.Values;
+
+            if(values == null || values.Count == 0)
+            {
+                return false;
+            }
+
+            foreach(var cell in values)
+            {
+                Console.WriteLine(cell);
+                if(cell[0].ToString() == playerId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
+        }
+
+        public async Task<string> deletCharacterSheet(string logsLink)
+        {
+            // 1. Extrair o Spreadsheet ID do link.
+            string spreadsheetId = ExtractSpreadsheetIdFromUrl(logsLink);
+            if (string.IsNullOrEmpty(spreadsheetId))
+            {
+                return "Error: Invalid Google Sheets URL.";
+            }
+
+            try
+            {
+                // 2. Deletar o arquivo da planilha no Google Drive.
+                await driveService.Files.Delete(spreadsheetId).ExecuteAsync();
+                return "Spreadsheet deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                return $"Error deleting spreadsheet: {ex.Message}";
+            }
+        }
+
+        public async Task<Dictionary<string,List<string>>> listPlayersAsync()
+        {
+            Dictionary<string, List<string>> players = new Dictionary<string, List<string>>();
+            List<string> LogsList;
+            
+            var range = $"ListaDeJogadores!B6:G1000";
+            var request = sheetsService.Spreadsheets.Values.Get(playerDataBaseId, range);
+            var response = await request.ExecuteAsync();
+            Console.WriteLine(request);
+            Console.WriteLine(response);
+            var values = response.Values;
+            Console.WriteLine(values);
+
+            foreach(IList<object> player in values)
+            {
+                Console.WriteLine(player);
+                string key = player[0].ToString();
+                LogsList = new List<string>();
+                for(int i = 1 ; i< player.Count-1 ; i++)
+                {
+                    if(!string.IsNullOrEmpty(player[i].ToString()))
+                    {
+                        LogsList.Add(player[i].ToString());
+                    }
+                }
+
+                players.Add(key,LogsList);
+
+            }
+            return players;
+        }
+    
+        #region aux functions
+        //* update a expesific value from a cell
+        private async Task updateCellValueAsync(string sheetsId, string cellPostion, string newValue)
+        {
+            var valueRange = new Google.Apis.Sheets.v4.Data.ValueRange
+            {
+                Range = cellPostion,
+                    Values = new List<IList<object>>{new List<object>{newValue}}
+            };
+
+            var updateRequest = sheetsService.Spreadsheets.Values.Update(valueRange, sheetsId,cellPostion);
+            updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+
+            await updateRequest.ExecuteAsync();
+
+        }
+
+        //* extract the id of the spreadsheets of the url
+        private string ExtractSpreadsheetIdFromUrl(string sheetUrl)
+        {
+            var urlParts = sheetUrl.Split('/');
+
+            if (urlParts.Length > 0)
+            {
+                return urlParts[5];
+            }
+
+            return string.Empty;
+        }
+
+        //* copy the notes of the sheets template and past to the new sheet
         private async Task CopyData(string newSheetId)
         {
-            // Pega os dados da planilha template (valores)
+
             var getDataRequest = sheetsService.Spreadsheets.Values.Get(templateSpreadSheetId, "A1:Z1000"); // Ajuste o intervalo conforme necessário
             var dataResponse = await getDataRequest.ExecuteAsync();
             var values = dataResponse.Values;
 
-            // Configura o valor a ser copiado para o novo documento usando uma requisição em lote
             var data = new List<ValueRange>
             {
                 new ValueRange
                 {
-                    Range = "LOG!A1:Z1000", // Certifique-se de que a aba e o intervalo estão corretos
+                    Range = "LOG!A1:Z1000",
                     Values = values
                 }
             };
 
-            // Usa o método BatchUpdate para evitar múltiplas requisições
             var batchUpdateRequest = new BatchUpdateValuesRequest
             {
                 Data = data,
                 ValueInputOption = "RAW"
             };
 
-            // Executa o BatchUpdate
             var batchUpdate = sheetsService.Spreadsheets.Values.BatchUpdate(batchUpdateRequest, newSheetId);
             await batchUpdate.ExecuteAsync();
         }
 
+        #endregion
     }
 }

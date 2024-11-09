@@ -12,14 +12,23 @@ namespace apiEsferas.Application.Sevices
             this.googleSheetsService = googleSheetsService;
         }
 
-        public async Task<string> registNewCharacter(string newCharacterName)
+        public async Task<string> registNewCharacter(string newCharacterName, string playerId)
         {
-            return await googleSheetsService.addNewCharacterAsync(newCharacterName);
+            return await googleSheetsService.addNewCharacterAsync(newCharacterName, playerId);
         }
 
-        internal async Task registNewCharacter(Func<string> characterName)
+        public async Task<bool> verifyIfPlayerAlreadyRegist(string playerId)
         {
-            throw new NotImplementedException();
+            return await googleSheetsService.IsPlayerRegisteredAsync(playerId);
+        }
+
+        public async Task<string> deleteCharacterSheets(string logsLink)
+        {
+            return await googleSheetsService.deletCharacterSheet(logsLink);
+        }
+        public async Task<Dictionary<string,List<string>>> listPlayers()
+        {
+            return await googleSheetsService.listPlayersAsync();
         }
     }
 }
