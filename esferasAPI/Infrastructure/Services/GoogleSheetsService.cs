@@ -6,7 +6,6 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using apiEsferas.Domain.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
-using apiEsferas.Domain.Exceptions;
 
 namespace apiEsferas.Infrastructure.Services
 {
@@ -49,21 +48,6 @@ namespace apiEsferas.Infrastructure.Services
         // Método para criar nova planilha copiando um template e copiar valores
         public async Task<string> addNewCharacterAsync(string newCharacterName)
         {
-            // Lista os arquivos no drive
-            var getFiles = driveService.Files.List();
-            getFiles.Q = $"'{destinationFolderId}' in parents and name contains '{newCharacterName}' and trashed = false";
-            getFiles.Fields = "files(id, name)";
-            var resultado = getFiles.Execute();
-            var files = resultado.Files;
-
-            // Verifica se existem arquivos
-            if (files != null && files.Any())
-            {
-                // Retorna o primeiro arquivo encontrado com o nome que contém o parâmetro
-                // Envia erro se o arquivo com nome igual existir
-                throw new DuplicateCharacterException(newCharacterName);
-            }
-
             // Cria uma nova cópia da planilha de template no Google Drive
             var requestBody = new Google.Apis.Drive.v3.Data.File
             {

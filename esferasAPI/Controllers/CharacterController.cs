@@ -1,5 +1,4 @@
 using apiEsferas.Application.Sevices;
-using apiEsferas.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiEsferas.Controllers
@@ -31,10 +30,6 @@ namespace apiEsferas.Controllers
             {
                 var newSheetUrl = await spreadSheetAppService.registNewCharacter(CharacterName);
                 return Ok(new{Url = newSheetUrl});
-            }
-            catch(DuplicateCharacterException ex)
-            {
-                return BadRequest(new {error = ex.Message});
             }
             catch(Exception ex)
             {
