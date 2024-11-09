@@ -22,7 +22,7 @@ namespace apiEsferas.Controllers
         {
             var CharacterName = request.newCharacterName;
             var playerId = request.playerId;
-            
+
             Console.WriteLine(CharacterName);
             if(string.IsNullOrEmpty(CharacterName))
             {
@@ -45,7 +45,7 @@ namespace apiEsferas.Controllers
                 return StatusCode(500, new {error = ex.Message});
             }
         }
-    
+
         [HttpGet("listPlayers")]
         public async Task<IActionResult> ListPlayers()
         {
@@ -56,12 +56,13 @@ namespace apiEsferas.Controllers
             });
         }
 
-        [HttpPost("moveFile")]
-        public async Task<IActionResult> moveFiles([FromBody] moveFilesRequest request)
-        {
-            var fileLink = request.fileLink;
-            var destinationFolderId = request.destinationLink;
-        }
+        // Aguardando implementacao
+        // [HttpPost("moveFile")]
+        // public async Task<IActionResult> moveFiles([FromBody] moveFilesRequest request)
+        // {
+        //     var fileLink = request.fileLink;
+        //     var destinationFolderId = request.destinationLink;
+        // }
 
         [HttpPost("deleteSheets")]
         public async Task<IActionResult> deleteCharacter([FromBody] CharacterDeleteRequest request)
@@ -83,3 +84,4 @@ namespace apiEsferas.Controllers
             return Ok(new{message = result});
         }
     }
+}

@@ -58,9 +58,6 @@ namespace apiEsferas.Infrastructure.Services
             var request = driveService.Files.Copy(requestBody, templateSpreadSheetId);
             var file = await request.ExecuteAsync();
 
-<<<<<<< HEAD
-            // Copia os dados da planilha template
-            await CopyData(file.Id);
             await updateCellValueAsync(file.Id,$"LOG:C133", playerId);
 
             return $"https://docs.google.com/spreadsheets/d/{file.Id}";
@@ -119,7 +116,7 @@ namespace apiEsferas.Infrastructure.Services
         {
             Dictionary<string, List<string>> players = new Dictionary<string, List<string>>();
             List<string> LogsList;
-            
+
             var range = $"ListaDeJogadores!B6:G1000";
             var request = sheetsService.Spreadsheets.Values.Get(playerDataBaseId, range);
             var response = await request.ExecuteAsync();
@@ -146,7 +143,7 @@ namespace apiEsferas.Infrastructure.Services
             }
             return players;
         }
-    
+
         #region aux functions
         //* update a expesific value from a cell
         private async Task updateCellValueAsync(string sheetsId, string cellPostion, string newValue)
@@ -177,38 +174,6 @@ namespace apiEsferas.Infrastructure.Services
             return string.Empty;
         }
 
-        //* copy the notes of the sheets template and past to the new sheet
-        private async Task CopyData(string newSheetId)
-        {
-
-            var getDataRequest = sheetsService.Spreadsheets.Values.Get(templateSpreadSheetId, "A1:Z1000"); // Ajuste o intervalo conforme necessário
-            var dataResponse = await getDataRequest.ExecuteAsync();
-            var values = dataResponse.Values;
-
-            var data = new List<ValueRange>
-            {
-                new ValueRange
-                {
-                    Range = "LOG!A1:Z1000",
-                    Values = values
-                }
-            };
-
-            var batchUpdateRequest = new BatchUpdateValuesRequest
-            {
-                Data = data,
-                ValueInputOption = "RAW"
-            };
-
-            var batchUpdate = sheetsService.Spreadsheets.Values.BatchUpdate(batchUpdateRequest, newSheetId);
-            await batchUpdate.ExecuteAsync();
-        }
-
         #endregion
-=======
-           
-            return $"https://docs.google.com/spreadsheets/d/{file.Id}";
-        }
->>>>>>> 87d807a99a13061a66ce533853a0241127465a94
     }
 }
