@@ -149,6 +149,7 @@ namespace apiEsferas.Controllers
                     if(text == "" || text =="-" || text == "Selecione seu Antecedente")
                     {
                         result += $"\t{checkListTags[i]}: {text}\n";
+                        isAllRight = false;
                     }
                     
                     switch (checkList[i])
@@ -156,27 +157,32 @@ namespace apiEsferas.Controllers
                         case "LOG!C6":
                             {
                                 roberto.setCharacterName(text);
-                            }break;
+                            }
+                            break;
                         case "LOG!T5":
                             {
-
-                            }break;
+                                roberto.setCharacterClass(text);
+                            }
+                            break;
                         case "LOG!T7":
                             {
-
-                            }break;
+                                roberto.setCharacterRace(text);
+                            }
+                            break;
                         case "LOG!AI11":
                             {
-
-                            }break;
+                                roberto.setcharacterBackground(text);
+                            }
+                            break;
                         case "Personagem!V25":
                             {
-
+                                roberto.setCharacterGuild(text);
                             }break;
                         case "Personagem!S21":
                             {
-
-                            }break;
+                                roberto.setCharacterImageLink(text);
+                            }
+                            break;
                     }
                 }
 
@@ -190,7 +196,7 @@ namespace apiEsferas.Controllers
                         $"> - Antecedente: {roberto.getcharacterBackground()}\n"+
                         $"> - Guilda:{roberto.getCharacterGuild()}\n"+
                         $"> - Imagem:\n\t {roberto.getCharacterImageLink()}"+
-                        "\n\n se todos os campos estiverem preenchido o resultado é aprovado luan, agora tu se vira pra resolver, tirara esse textoeu poderia mandar um json com os dados organizados, mas isso seria muito facil";
+                        "\n\n se todos os campos estiverem preenchido o resultado é aprovado luan, agora tu se vira pra resolver, tirara esse texto, eu poderia mandar um json com os dados organizados, mas isso seria muito facil";
 
                 }
 
