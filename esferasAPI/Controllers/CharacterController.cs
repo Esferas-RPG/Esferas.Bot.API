@@ -33,8 +33,6 @@ namespace apiEsferas.Controllers
                 return BadRequest("Luan, cade a porra do id");
             }
 
-            //* Adicionar verificação se o jogador já existe
-
             try
             {
                 var newSheetUrl = await spreadSheetAppService.registNewCharacter(CharacterName, playerId);
