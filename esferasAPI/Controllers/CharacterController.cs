@@ -92,7 +92,7 @@ namespace apiEsferas.Controllers
             return Ok(new{message = result});
         }
 
-        [HttpGet("validateCharacter")]
+        [HttpPost("validateCharacter")]
         public async Task<IActionResult> validadeCharacter([FromBody] CharacterLogsRequest request)
         {
             var logsLink = request.logsLink;
@@ -141,6 +141,7 @@ namespace apiEsferas.Controllers
                 "Guilda",
                 "Link de imagem de personagem"
             };
+
             try
             {
                 for(int i = 0; i < checkList.Length; i++)
@@ -151,7 +152,7 @@ namespace apiEsferas.Controllers
                         result += $"\t{checkListTags[i]}: {text}\n";
                         isAllRight = false;
                     }
-                    
+
                     switch (checkList[i])
                     {
                         case "LOG!C6":

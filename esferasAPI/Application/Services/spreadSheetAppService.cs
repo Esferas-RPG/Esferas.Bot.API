@@ -33,7 +33,7 @@ namespace apiEsferas.Application.Sevices
 
         public async Task<string> verifyTheDataInACell(string linkSheet, string cellPosition)
         {
-            return await verifyTheDataInACell( linkSheet, cellPosition);
+            return await googleSheetsService.verifyTheDataInACell( linkSheet, cellPosition);
         }
     }
 }

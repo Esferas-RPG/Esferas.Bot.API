@@ -155,10 +155,28 @@ namespace apiEsferas.Infrastructure.Services
         public async Task<string> verifyTheDataInACell(string linkSheet, string cellPosition)
         {
             var sheetId = ExtractSpreadsheetIdFromUrl(linkSheet);
-            var request = sheetsService.Spreadsheets.Values.Get(sheetId,cellPosition);
-            var response = await request.ExecuteAsync();
+            var request = sheetsService.Spreadsheets.Values.Get(sheetId, cellPosition);
+            var cellValue = "";
+            
 
-            return response.Values[0][0].ToString();
+            try{    
+                var response = await request.ExecuteAsync();
+                cellValue = response.Values[0][0].ToString();
+
+                Console.WriteLine(cellValue);
+
+                if (response.Values != null && response.Values.Count > 0 && response.Values[0].Count > 0)
+                {
+                    cellValue = response.Values[0][0].ToString();
+                    Console.WriteLine(cellValue);
+                }
+               
+            }
+            catch(Exception err)
+            {
+                Console.WriteLine(err);
+            }
+             return cellValue;
 
         }
 
