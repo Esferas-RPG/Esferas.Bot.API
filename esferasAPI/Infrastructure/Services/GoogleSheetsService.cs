@@ -1,5 +1,5 @@
 using Google.Apis.Sheets.v4;
-using Google.Apis.Sheets.v4.Data;
+using GoogleSheetsData = Google.Apis.Sheets.v4.Data;
 using Google.Apis.Drive.v3;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
@@ -46,7 +46,7 @@ namespace apiEsferas.Infrastructure.Services
             });
         }
 
-        public async Task<string> addNewCharacterAsync(string newCharacterName, string playerId)
+        public async Task<string> addNewCharacterAsync(string newCharacterName, string playerId, string resgisterID)
         {
             // Cria uma nova cópia da planilha de template no Google Drive
             var requestBody = new Google.Apis.Drive.v3.Data.File
@@ -58,7 +58,8 @@ namespace apiEsferas.Infrastructure.Services
             var request = driveService.Files.Copy(requestBody, templateSpreadSheetId);
             var file = await request.ExecuteAsync();
 
-            await updateCellValueAsync(file.Id,$"LOG:C133", playerId);
+            await updateCellValueAsync(file.Id, $"LOG:C133", playerId);
+            await updateCellValueAsync(file.Id, $"LOG:I133", resgisterID);
 
             // Ajustar permissao da ficha
             var permission = new Google.Apis.Drive.v3.Data.Permission
@@ -128,8 +129,6 @@ namespace apiEsferas.Infrastructure.Services
             var range = $"ListaDeJogadores!B6:G1000";
             var request = sheetsService.Spreadsheets.Values.Get(playerDataBaseId, range);
             var response = await request.ExecuteAsync();
-            Console.WriteLine(request);
-            Console.WriteLine(response);
             var values = response.Values;
             Console.WriteLine(values);
 
@@ -150,6 +149,17 @@ namespace apiEsferas.Infrastructure.Services
 
             }
             return players;
+        }
+
+        //* returns the content of a cell in excell
+        public async Task<string> verifyTheDataInACell(string linkSheet, string cellPosition)
+        {
+            var sheetId = ExtractSpreadsheetIdFromUrl(linkSheet);
+            var request = sheetsService.Spreadsheets.Values.Get(sheetId,cellPosition);
+            var response = await request.ExecuteAsync();
+
+            return response.Values[0][0].ToString();
+
         }
 
         #region aux functions

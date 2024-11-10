@@ -12,9 +12,9 @@ namespace apiEsferas.Application.Sevices
             this.googleSheetsService = googleSheetsService;
         }
 
-        public async Task<string> registNewCharacter(string newCharacterName, string playerId)
+        public async Task<string> registNewCharacter(string newCharacterName, string playerId, string registerIs)
         {
-            return await googleSheetsService.addNewCharacterAsync(newCharacterName, playerId);
+            return await googleSheetsService.addNewCharacterAsync(newCharacterName, playerId, registerIs);
         }
 
         public async Task<bool> verifyIfPlayerAlreadyRegist(string playerId)
@@ -29,6 +29,11 @@ namespace apiEsferas.Application.Sevices
         public async Task<Dictionary<string,List<string>>> listPlayers()
         {
             return await googleSheetsService.listPlayersAsync();
+        }
+
+        public async Task<string> verifyTheDataInACell(string linkSheet, string cellPosition)
+        {
+            return await verifyTheDataInACell( linkSheet, cellPosition);
         }
     }
 }
