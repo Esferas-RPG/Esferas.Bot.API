@@ -1,6 +1,6 @@
 namespace apiEsferas.Application.DTO;
 
-public class CharacterDeleteRequest
+public class CharacterLogsRequest
 {
     public string logsLink {get; set;}
 
