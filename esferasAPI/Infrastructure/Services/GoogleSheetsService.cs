@@ -161,9 +161,9 @@ namespace apiEsferas.Infrastructure.Services
 
             try{    
                 var response = await request.ExecuteAsync();
-                cellValue = response.Values[0][0].ToString();
+                
 
-                Console.WriteLine(cellValue);
+                
 
                 if (response.Values != null && response.Values.Count > 0 && response.Values[0].Count > 0)
                 {

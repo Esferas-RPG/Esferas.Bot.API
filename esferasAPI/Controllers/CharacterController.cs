@@ -1,7 +1,8 @@
 using apiEsferas.Application.Sevices;
 using apiEsferas.Application.DTO;
-using apiEsferas.Domain.entities;
+using apiEsferas.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+
 
 
 namespace apiEsferas.Controllers
@@ -98,7 +99,7 @@ namespace apiEsferas.Controllers
             var logsLink = request.logsLink;
             var result = "Estão faltando dados nos seguintes campos:\n";
             bool isAllRight = true;
-            Character roberto = new Character();
+            var roberto = new Character();
 
             if(string.IsNullOrEmpty(logsLink))
             {
@@ -157,31 +158,31 @@ namespace apiEsferas.Controllers
                     {
                         case "LOG!C6":
                             {
-                                roberto.setCharacterName(text);
+                                roberto.CharacterName = text;
                             }
                             break;
                         case "LOG!T5":
                             {
-                                roberto.setCharacterClass(text);
+                                roberto.CharacterClass = text;
                             }
                             break;
                         case "LOG!T7":
                             {
-                                roberto.setCharacterRace(text);
+                                roberto.CharacterRace = text;
                             }
                             break;
                         case "LOG!AI11":
                             {
-                                roberto.setcharacterBackground(text);
+                                roberto.CharacterBackground = text;
                             }
                             break;
                         case "Personagem!V25":
                             {
-                                roberto.setCharacterGuild(text);
+                                roberto.CharacterGuild = text;
                             }break;
                         case "Personagem!S21":
                             {
-                                roberto.setCharacterImageLink(text);
+                                roberto.CharacterImageLink = text;
                             }
                             break;
                     }
@@ -191,17 +192,20 @@ namespace apiEsferas.Controllers
                 {
                     result =
                         "Novo aventureiro registrado!"+
-                        $"> - Nome de personagem: {roberto.getCharacterName()}"+
-                        $"> - Raça:{roberto.getCharcterRace()} \n"+
-                        $"> - Classe:{roberto.getCharacterClass()}\n"+
-                        $"> - Antecedente: {roberto.getcharacterBackground()}\n"+
-                        $"> - Guilda:{roberto.getCharacterGuild()}\n"+
-                        $"> - Imagem:\n\t {roberto.getCharacterImageLink()}"+
+                        $"> - Nome de personagem: {roberto.CharacterName}"+
+                        $"> - Raça:{roberto.CharacterRace} \n"+
+                        $"> - Classe:{roberto.CharacterClass}\n"+
+                        $"> - Antecedente: {roberto.CharacterBackground}\n"+
+                        $"> - Guilda:{roberto.CharacterGuild}\n"+
+                        $"> - Imagem:\n\t {roberto.CharacterImageLink}"+
                         "\n\n se todos os campos estiverem preenchido o resultado é aprovado luan, agora tu se vira pra resolver, tirara esse texto, eu poderia mandar um json com os dados organizados, mas isso seria muito facil";
 
                 }
 
-                return Ok(new{Conclusion = result});
+                return Ok(new{
+                    Conclusion = result,
+                    PlayerData = roberto
+                    });
             }
             catch(Exception err)
             {
