@@ -35,5 +35,11 @@ namespace apiEsferas.Application.Sevices
         {
             return await googleSheetsService.verifyTheDataInACell( linkSheet, cellPosition);
         }
+
+        public async Task changeSpreadSheetsName(string spreadsheetURL, string spreadsheetName)
+        {
+            await googleSheetsService.changeSpreadSheetsName( spreadsheetURL,  spreadsheetName);
+        }
+
     }
 }

@@ -5,6 +5,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using apiEsferas.Domain.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Google.Apis.Sheets.v4.Data;
 
 namespace apiEsferas.Infrastructure.Services
 {
@@ -157,13 +158,9 @@ namespace apiEsferas.Infrastructure.Services
             var sheetId = ExtractSpreadsheetIdFromUrl(linkSheet);
             var request = sheetsService.Spreadsheets.Values.Get(sheetId, cellPosition);
             var cellValue = "";
-            
 
-            try{    
+            try{
                 var response = await request.ExecuteAsync();
-                
-
-                
 
                 if (response.Values != null && response.Values.Count > 0 && response.Values[0].Count > 0)
                 {
@@ -178,6 +175,38 @@ namespace apiEsferas.Infrastructure.Services
             }
              return cellValue;
 
+        }
+
+        public async Task changeSpreadSheetsName(string spreadsheetURL, string spreadsheetName)
+        {
+            var sheetId = ExtractSpreadsheetIdFromUrl(spreadsheetURL);
+
+            var updateRequest = new Request
+            {
+                UpdateSpreadsheetProperties = new UpdateSpreadsheetPropertiesRequest
+                {
+                    Properties = new SpreadsheetProperties
+                    {
+                        Title= spreadsheetName
+                    },
+                    Fields= "title"
+                }
+            };
+
+            var batchUpdateRequest = new BatchUpdateSpreadsheetRequest
+            {
+                Requests = new[] {updateRequest}
+            };
+
+            try
+            {
+                var request = sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequest, sheetId);
+                var response = await request.ExecuteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Quem quebro o codigo??? a pera fui eu e essa aqui é o erro: {ex.Message}");
+            }
         }
 
         #region aux functions
@@ -209,6 +238,8 @@ namespace apiEsferas.Infrastructure.Services
 
             return string.Empty;
         }
+
+
 
         #endregion
     }

@@ -12,5 +12,7 @@
 
         Task<string> verifyTheDataInACell(string linkSheet, string cellPosition);
 
+        Task changeSpreadSheetsName(string spreadsheetURL, string spreadsheetName);
+
     }
 }

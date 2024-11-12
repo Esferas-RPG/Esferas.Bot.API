@@ -199,6 +199,7 @@ namespace apiEsferas.Controllers
                         $"> - Guilda:{roberto.CharacterGuild}\n"+
                         $"> - Imagem:\n\t {roberto.CharacterImageLink}"+
                         "\n\n se todos os campos estiverem preenchido o resultado é aprovado luan, agora tu se vira pra resolver, tirara esse texto, eu poderia mandar um json com os dados organizados, mas isso seria muito facil";
+                    await spreadSheetAppService.changeSpreadSheetsName(logsLink, roberto.CharacterName);
 
                 }
 
