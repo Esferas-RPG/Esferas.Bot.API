@@ -2,6 +2,7 @@ using apiEsferas.Application.Sevices;
 using apiEsferas.Application.DTO;
 using apiEsferas.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Google;
 
 
 
@@ -11,11 +12,14 @@ namespace apiEsferas.Controllers
     [Route("/[controller]")]
     public class CharacterController : ControllerBase
     {
-        private readonly SpreadSheetAppService spreadSheetAppService;
+        private readonly GoogleApiAppService googleApiAppService;
+        private readonly string folderLink;
 
-        public CharacterController(SpreadSheetAppService spreadSheetAppService)
+        public CharacterController(GoogleApiAppService googleApiAppService)
         {
-            this.spreadSheetAppService = spreadSheetAppService;
+            this.googleApiAppService = googleApiAppService;
+
+            this.folderLink = Environment.GetEnvironmentVariable("LOGS_ACTIVE_PLAYERS_FOLDER_URL");
         }
 
 
@@ -44,7 +48,7 @@ namespace apiEsferas.Controllers
 
             try
             {
-                var newSheetUrl = await spreadSheetAppService.registNewCharacter(CharacterName, playerId, registerId);
+                var newSheetUrl = await googleApiAppService.registNewCharacter(CharacterName, playerId, registerId);
                 return Ok(new{Url = newSheetUrl});
             }
             catch(Exception ex)
@@ -53,25 +57,40 @@ namespace apiEsferas.Controllers
             }
         }
 
-        [HttpGet("listPlayers")]
-        public async Task<IActionResult> ListPlayers()
-        {
-            Dictionary<string,List<string>> players = new Dictionary<string,List<string>>();
-            players = await spreadSheetAppService.listPlayers();
-            return Ok(new{
-                Players = players
-            });
-        }
+       
 
         
 
         // Aguardando implementacao
-        // [HttpPost("moveFile")]
-        // public async Task<IActionResult> moveFiles([FromBody] moveFilesRequest request)
-        // {
-        //     var fileLink = request.fileLink;
-        //     var destinationFolderId = request.destinationLink;
-        // }
+        [HttpPost("moveFile")]
+        public async Task<IActionResult> moveFiles([FromBody] moveFilesRequest request)
+        {
+            string fileLink = request.fileLink;
+            string destinationFolderId = request.destinationLink;
+
+            if(string.IsNullOrEmpty(fileLink))
+            {
+                return BadRequest("The file link is required because if i dont have the link how i should know what move");
+            }
+
+            if(string.IsNullOrEmpty(destinationFolderId))
+            {
+                return BadRequest("The destination folder link is required because, where the f* i gonna place the file");
+            }
+
+            try{
+                await googleApiAppService.changeFilePosition(fileLink,destinationFolderId);
+
+                return Ok(new{message = "File in the new place "});
+            }
+            catch(Exception ext)
+            {
+                return StatusCode(500, $"something goes wrong: {ext.Message}");
+            }
+
+
+
+        }
 
         [HttpPost("deleteCharacter")]
         public async Task<IActionResult> deleteCharacter([FromBody] CharacterLogsRequest request)
@@ -83,7 +102,7 @@ namespace apiEsferas.Controllers
                 return BadRequest("The logs link is required");
             }
 
-            string result = await spreadSheetAppService.deleteCharacterSheets(logsLink);
+            string result = await googleApiAppService.deleteCharacterSheets(logsLink);
 
             if(result != "Spreadsheet deleted successfully.")
             {
@@ -147,7 +166,7 @@ namespace apiEsferas.Controllers
             {
                 for(int i = 0; i < checkList.Length; i++)
                 {
-                    string text = await spreadSheetAppService.verifyTheDataInACell(logsLink, checkList[i]);
+                    string text = await googleApiAppService.getDataInACell(logsLink, checkList[i]);
                     if(text == "" || text =="-" || text == "Selecione seu Antecedente")
                     {
                         result += $"\t{checkListTags[i]}: {text}\n";
@@ -199,7 +218,8 @@ namespace apiEsferas.Controllers
                         $"> - Guilda:{roberto.CharacterGuild}\n"+
                         $"> - Imagem:\n\t {roberto.CharacterImageLink}"+
                         "\n\n se todos os campos estiverem preenchido o resultado é aprovado luan, agora tu se vira pra resolver, tirara esse texto, eu poderia mandar um json com os dados organizados, mas isso seria muito facil";
-                    await spreadSheetAppService.changeSpreadSheetsName(logsLink, roberto.CharacterName);
+                    await googleApiAppService.changeSpreadSheetsName(logsLink, roberto.CharacterName);
+                    await googleApiAppService.changeFilePosition(logsLink,folderLink);
 
                 }
 

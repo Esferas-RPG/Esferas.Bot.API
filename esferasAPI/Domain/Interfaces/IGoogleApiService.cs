@@ -1,18 +1,22 @@
-﻿namespace apiEsferas.Domain.Interfaces
+﻿using apiEsferas.Domain.Entities;
+
+namespace apiEsferas.Domain.Interfaces
 {
-    public interface IGoogleSheetsService
+    public interface IGoogleApiService
     {
         Task<string> addNewCharacterAsync(string newCharacterName, string plaierId, string resgisterID);
 
         Task<bool> IsPlayerRegisteredAsync(string playerId);
 
-        Task<Dictionary<string,List<string>>> listPlayersAsync();
+        Task<List<Player>> listPlayersAsync();
 
         Task<string> deletCharacterSheet(string logsLink);
 
-        Task<string> verifyTheDataInACell(string linkSheet, string cellPosition);
+        Task<string> getDataInACell(string linkSheet, string cellPosition);
 
         Task changeSpreadSheetsName(string spreadsheetURL, string spreadsheetName);
+
+        Task changeFilePosition(string fileId, string folderId);
 
     }
 }

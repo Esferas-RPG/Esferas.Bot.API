@@ -6,10 +6,11 @@ using Google.Apis.Services;
 using apiEsferas.Domain.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Google.Apis.Sheets.v4.Data;
+using apiEsferas.Domain.Entities;
 
 namespace apiEsferas.Infrastructure.Services
 {
-    public class GoogleSheetsService : IGoogleSheetsService
+    public class GoogleApiService : IGoogleApiService
     {
         private readonly SheetsService sheetsService;
         private readonly DriveService driveService;
@@ -18,7 +19,7 @@ namespace apiEsferas.Infrastructure.Services
         private readonly string destinationFolderId;
         private readonly string playerDataBaseId;
 
-        public GoogleSheetsService()
+        public GoogleApiService()
         {
             // Carrega variáveis de ambiente
             DotNetEnv.Env.Load();
@@ -104,7 +105,7 @@ namespace apiEsferas.Infrastructure.Services
         public async Task<string> deletCharacterSheet(string logsLink)
         {
             // 1. Extrair o Spreadsheet ID do link.
-            string spreadsheetId = ExtractSpreadsheetIdFromUrl(logsLink);
+            string spreadsheetId = ExtractIdFromUrl(logsLink, "spreadSheet");
             if (string.IsNullOrEmpty(spreadsheetId))
             {
                 return "Error: Invalid Google Sheets URL.";
@@ -122,9 +123,9 @@ namespace apiEsferas.Infrastructure.Services
             }
         }
 
-        public async Task<Dictionary<string,List<string>>> listPlayersAsync()
+        public async Task<List<Player>> listPlayersAsync()
         {
-            Dictionary<string, List<string>> players = new Dictionary<string, List<string>>();
+            List<Player> playersList = new List<Player>();
             List<string> LogsList;
 
             var range = $"ListaDeJogadores!B6:G1000";
@@ -135,27 +136,27 @@ namespace apiEsferas.Infrastructure.Services
 
             foreach(IList<object> player in values)
             {
-                Console.WriteLine(player);
-                string key = player[0].ToString();
+                var roberto = new Player(player[0].ToString());
+                
                 LogsList = new List<string>();
-                for(int i = 1 ; i< player.Count-1 ; i++)
+                for(int i = 0 ; i< player.Count-1; i++)
                 {
                     if(!string.IsNullOrEmpty(player[i].ToString()))
                     {
-                        LogsList.Add(player[i].ToString());
+                        roberto.setPlayerCharacterLink(i, player[i+1].ToString());
                     }
                 }
 
-                players.Add(key,LogsList);
+                playersList.Add(roberto);
 
             }
-            return players;
+            return playersList;
         }
 
         //* returns the content of a cell in excell
-        public async Task<string> verifyTheDataInACell(string linkSheet, string cellPosition)
+        public async Task<string> getDataInACell(string linkSheet, string cellPosition)
         {
-            var sheetId = ExtractSpreadsheetIdFromUrl(linkSheet);
+            var sheetId = ExtractIdFromUrl(linkSheet, "spreadSheet");
             var request = sheetsService.Spreadsheets.Values.Get(sheetId, cellPosition);
             var cellValue = "";
 
@@ -179,7 +180,7 @@ namespace apiEsferas.Infrastructure.Services
 
         public async Task changeSpreadSheetsName(string spreadsheetURL, string spreadsheetName)
         {
-            var sheetId = ExtractSpreadsheetIdFromUrl(spreadsheetURL);
+            var sheetId = ExtractIdFromUrl(spreadsheetURL, "spreadSheet");
 
             var updateRequest = new Request
             {
@@ -209,6 +210,33 @@ namespace apiEsferas.Infrastructure.Services
             }
         }
 
+        public async Task changeFilePosition(string fileUrl, string folderURL)
+        {
+            try{
+                var fileId = ExtractIdFromUrl(fileUrl, "spreadSheet");
+                var folderId = ExtractIdFromUrl(folderURL, "folder");
+
+                var request = driveService.Files.Get(fileId);
+                request.Fields = "parents";
+                var response = request.ExecuteAsync();
+
+                var updateRequest = driveService.Files.Update(new Google.Apis.Drive.v3.Data.File(), fileId);
+
+                updateRequest.Fields = "id, params";
+
+                updateRequest.AddParents = folderId;
+                response = updateRequest.ExecuteAsync();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Something go wrong here error: {ex.Message}");
+            }
+
+
+
+
+        }
+
         #region aux functions
         //* update a expesific value from a cell
         private async Task updateCellValueAsync(string sheetsId, string cellPostion, string newValue)
@@ -227,13 +255,27 @@ namespace apiEsferas.Infrastructure.Services
         }
 
         //* extract the id of the spreadsheets of the url
-        private string ExtractSpreadsheetIdFromUrl(string sheetUrl)
+        private string ExtractIdFromUrl(string sheetUrl, string urlType)
         {
+            int position=0;
+            switch(urlType)
+            {
+                case "spreadSheet":
+                {
+                    position = 5;
+                }
+                break;
+                case "folder":
+                {
+                    position = 7;
+                }
+                break;
+            }
             var urlParts = sheetUrl.Split('/');
 
             if (urlParts.Length > 0)
             {
-                return urlParts[5];
+                return urlParts[position];
             }
 
             return string.Empty;
