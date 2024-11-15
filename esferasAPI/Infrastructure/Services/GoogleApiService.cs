@@ -174,12 +174,18 @@ namespace apiEsferas.Infrastructure.Services
                 Values = new List<IList<object>>{newData}
             };
 
-            var request = sheetsService.Spreadsheets.Values.Append(valueRange, spreadSheetId, range);
+            
 
-            try{
+            try
+            {
+                var request = sheetsService.Spreadsheets.Values.Append(valueRange, spreadSheetId, range);
                 request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
 
                 var response = await request.ExecuteAsync();
+
+                string result = response.Updates?.UpdatedRows > 0 ? "Linha adicionada com sucesso." : "Falha ao adicionar a linha.";
+
+                Console.WriteLine(result);
                 
 
             }
