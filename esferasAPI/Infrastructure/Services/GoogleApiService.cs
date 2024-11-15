@@ -156,6 +156,39 @@ namespace apiEsferas.Infrastructure.Services
             return playersList;
         }
 
+        public async Task appendNewDataToSheet(string spreadSheetLink, List<object> newData, string range)
+        {
+            string spreadSheetId;
+
+            if(spreadSheetLink.Contains('/'))
+            {
+                spreadSheetId = ExtractIdFromUrl(spreadSheetLink, "spreadSheet");
+            }
+            else
+            {
+                spreadSheetId = spreadSheetLink;
+            }
+
+            var valueRange = new ValueRange
+            {
+                Values = new List<IList<object>>{newData}
+            };
+
+            var request = sheetsService.Spreadsheets.Values.Append(valueRange, spreadSheetId, range);
+
+            try{
+                request.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.RAW;
+
+                var response = await request.ExecuteAsync();
+                
+
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Erro ao adicionar Linha: {ex.Message}");
+            }
+        }
+
         //* returns the content of a cell in excell
         public async Task<string> getDataInACell(string linkSheet, string cellPosition)
         {

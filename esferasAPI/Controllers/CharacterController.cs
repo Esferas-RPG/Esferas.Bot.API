@@ -13,6 +13,7 @@ namespace apiEsferas.Controllers
     {
         private readonly GoogleApiAppService googleApiAppService;
         private readonly string folderLink;
+        
 
         public CharacterController(GoogleApiAppService googleApiAppService)
         {
@@ -21,7 +22,6 @@ namespace apiEsferas.Controllers
             this.folderLink = Environment.GetEnvironmentVariable("LOGS_ACTIVE_PLAYERS_FOLDER_URL");
         }
 
-
         //* Route post to regist a new CharacterLog
         [HttpPost("newCharacter")]
         public async Task<IActionResult> addNewCharacter([FromBody] CharacterRequest request)
@@ -29,6 +29,8 @@ namespace apiEsferas.Controllers
             var CharacterName = request.newCharacterName;
             var playerId = request.playerId;
             var registerId = request.registerId;
+
+            bool mulequeJaExite = false;
 
             Console.WriteLine(CharacterName);
             if(string.IsNullOrEmpty(CharacterName))
@@ -45,20 +47,53 @@ namespace apiEsferas.Controllers
             }
             //* Adicionar verificação se o jogador já existe
 
-            try
+            List<Player> playersList = await googleApiAppService.listPlayers();
+
+            foreach(Player pagodeiro in playersList)
             {
-                var newSheetUrl = await googleApiAppService.registNewCharacter(CharacterName, playerId, registerId);
-                return Ok(new{Url = newSheetUrl});
+                if(pagodeiro.playerId == playerId)
+                {
+                    mulequeJaExite = true;
+                }
             }
-            catch(Exception ex)
+
+            if(mulequeJaExite)
             {
-                return StatusCode(500, new {error = ex.Message});
+                try
+                {
+                    var newCharacterUrl = await googleApiAppService.registNewCharacter(CharacterName, playerId, registerId);
+                    var listNewPlayer = new List<object> {playerId, newCharacterUrl};
+                    var range = "ListaDeJogadores";
+                    var playerDataBaseId = Environment.GetEnvironmentVariable("PLAYER_DATA_BASE_ID");
+                    await googleApiAppService.appendNewDataToSheet(playerDataBaseId, listNewPlayer, range);
+
+                    return Ok(new{Url = newCharacterUrl});
+                }
+                catch(Exception ex)
+                {
+                    return StatusCode(500, new {error = ex.Message});
+                }
             }
+            else
+            {
+                try
+                {
+                    var newCharacterUrl = await googleApiAppService.registNewCharacter(CharacterName, playerId, registerId);
+                    var listNewPlayer = new List<object> {playerId, newCharacterUrl};
+                    var range = "ListaDeJogadores";
+                    var playerDataBaseId = Environment.GetEnvironmentVariable("PLAYER_DATA_BASE_ID");
+                    await googleApiAppService.appendNewDataToSheet(playerDataBaseId, listNewPlayer, range);
+
+                    return Ok(new{Url = newCharacterUrl});
+                }
+                catch(Exception ex)
+                {
+                    return StatusCode(500, new {error = ex.Message});
+                }
+            }
+
+            return Ok();
         }
-
-       
-
-        
 
         // Aguardando implementacao
         [HttpPost("moveFile")]

@@ -40,7 +40,10 @@ namespace apiEsferas.Application.Sevices
             await googleApiService.changeSpreadSheetsName( spreadsheetURL,  spreadsheetName);
         }
 
-
+        public async Task appendNewDataToSheet(string spreadSheetLink, List<object> newData, string range)
+        {
+            await googleApiService.appendNewDataToSheet(spreadSheetLink, newData, range );
+        }
         public async Task changeFilePosition(string fileId, string folderId)
         {
             await googleApiService.changeFilePosition(fileId, folderId);
