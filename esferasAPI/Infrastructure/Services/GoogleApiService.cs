@@ -134,22 +134,25 @@ namespace apiEsferas.Infrastructure.Services
             var values = response.Values;
             Console.WriteLine(values);
 
-            foreach(IList<object> player in values)
-            {
-                var roberto = new Player(player[0].ToString());
-                
-                LogsList = new List<string>();
-                for(int i = 0 ; i< player.Count-1; i++)
+           if(values != null)
+           {
+                foreach(IList<object> player in values)
                 {
-                    if(!string.IsNullOrEmpty(player[i].ToString()))
+                    var roberto = new Player(player[0].ToString());
+                    
+                    LogsList = new List<string>();
+                    for(int i = 0 ; i< player.Count-1; i++)
                     {
-                        roberto.setPlayerCharacterLink(i, player[i+1].ToString());
+                        if(!string.IsNullOrEmpty(player[i].ToString()))
+                        {
+                            roberto.setPlayerCharacterLink(i, player[i+1].ToString());
+                        }
                     }
+
+                    playersList.Add(roberto);
+
                 }
-
-                playersList.Add(roberto);
-
-            }
+           }
             return playersList;
         }
 
