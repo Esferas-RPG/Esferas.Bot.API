@@ -1,4 +1,4 @@
- using apiEsferas.Application.Sevices;
+using apiEsferas.Application.Sevices;
 using apiEsferas.Domain.Interfaces;
 using apiEsferas.Infrastructure.Services;
 
@@ -14,7 +14,6 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
