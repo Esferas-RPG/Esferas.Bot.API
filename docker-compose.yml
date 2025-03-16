@@ -1,0 +1,24 @@
+services:
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: esferas_api
+        restart: always
+        ports:
+            - '5101:8080'
+        env_file:
+            - esferasAPI/.env
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+        volumes:
+            - ./esferasAPI/credentialGoogleAPI.json:/app/credentialGoogleAPI.json:ro
+            - ./esferasAPI/.env:/app/.env:ro
+        networks:
+            - minha_rede
+
+networks:
+    minha_rede:
+
+volumes:
+    postgres_data:
