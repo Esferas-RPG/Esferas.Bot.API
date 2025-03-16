@@ -20,8 +20,8 @@ WORKDIR /app
 COPY --from=build /out ./
 
 # Copia os arquivos de configuração (credenciais e variáveis de ambiente)
-COPY esferasAPI/credentialGoogleAPI.json /app/credentialGoogleAPI.json
-COPY esferasAPI/.env /app/.env
+# COPY esferasAPI/credentialGoogleAPI.json /app/credentialGoogleAPI.json
+# COPY esferasAPI/.env /app/.env
 
 # Expõe as portas da API
 EXPOSE 5101
