@@ -4,7 +4,7 @@ namespace apiEsferas.Domain.Entities
     {
         public string playerId {get;set;}
 
-        public string[] characterLink{get; set;}
+        public string[] characterLink {get; set;}
 
         public Player()
         {

@@ -17,7 +17,8 @@ namespace apiEsferas.Domain.Interfaces
         Task changeSpreadSheetsName(string spreadsheetURL, string spreadsheetName);
 
         Task changeFilePosition(string fileId, string folderId);
-       Task appendNewDataToSheet(string spreadSheetLink, List<object> newData, string range);
+
+        Task appendNewDataToSheet(string spreadSheetLink, List<object> newData, string range);
 
     }
 }

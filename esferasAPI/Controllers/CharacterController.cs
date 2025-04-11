@@ -190,7 +190,7 @@ namespace apiEsferas.Controllers
                 "Inteligência",
                 "Sabedoria",
                 "Carisma",
-                "Antecedente",
+                "Alinhamento",
                 "Vida",
                 "Guilda",
                 "Link de imagem de personagem"
